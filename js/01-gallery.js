@@ -7,23 +7,24 @@ const imagesContainer = document.querySelector('.gallery');
 // console.log(imagesContainer)
 const imagesMarkup = createImagesMarkup(galleryItems);
 imagesContainer.insertAdjacentHTML('beforeend', imagesMarkup);
+console.log(imagesMarkup)
 
 imagesContainer.addEventListener('click', onImagesClick)
 
 function createImagesMarkup(galleryItems) {
     return galleryItems
-        .map(galleryItem => {
+        .map(({original, preview, description}) => {
         return `<div class="gallery__item">
-<a class="gallery__link" href="${galleryItem.original}">
+<a class="gallery__link" href="${original}">
     <img
     class="gallery__image"
-    src="${galleryItem.preview}"
-    data-source="${galleryItem.original}"
-    alt="${galleryItem.description}"
+    src="${preview}"
+    data-source="${original}"
+    alt="${description}"
     />
 </a>
 </div>`})
-        .join('')
+       .join('')
 };
 
 function onImagesClick(evt) {
@@ -35,12 +36,24 @@ function onImagesClick(evt) {
 // console.log(evt.target)
     const instance = basicLightbox.create(`
     <img src="${evt.target.dataset.source}" width="800" height="600">
-`)
-    instance.show();
+`, {
+        onShow: (instance) => {
+        window.addEventListener('keydown', onEscBtnPress);
+        // document.body.style.backgroundColor = 'tomato'
+    },
 
-    imagesContainer.addEventListener('keydown', (evt) => {
-        if (evt.code === 'Escape') {
+        onClose: (instance) => {
+            window.removeEventListener('keydown', onEscBtnPress);
+            //  document.body.style.backgroundColor = 'green'
+        },
+    })
+    console.dir(instance)
+    instance.show();
+    const elem = instance.element()
+    console.log(elem)
+    function onEscBtnPress(evt) {
+    if (evt.code === 'Escape') {
             instance.close();
         }
-    });
+}
 }
